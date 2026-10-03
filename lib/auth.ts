@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { getConfiguredAdminEmail } from "@/lib/admin-config";
 import { createClient } from "@/lib/supabase/server";
 
 export async function getAdmin() {
@@ -8,7 +9,7 @@ export async function getAdmin() {
   if (error) throw new Error(`Could not verify the current session: ${error.message}`);
   if (!user) return null;
 
-  const adminEmail = process.env.SUPABASE_ADMIN_EMAIL?.trim().toLowerCase();
+  const adminEmail = getConfiguredAdminEmail();
   const isAdmin = user.app_metadata.role === "admin"
     && Boolean(adminEmail)
     && user.email?.toLowerCase() === adminEmail;

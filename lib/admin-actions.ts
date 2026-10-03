@@ -4,6 +4,7 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
+import { getConfiguredAdminEmail } from "@/lib/admin-config";
 import { getAdmin } from "@/lib/auth";
 import { sanitizeArticleHtml } from "@/lib/content";
 import { slugify } from "@/lib/slug";
@@ -30,7 +31,7 @@ export type ActionState = { error?: string; success?: string };
 export async function loginAction(_previous: ActionState, formData: FormData): Promise<ActionState> {
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
   const password = String(formData.get("password") ?? "");
-  const adminEmail = process.env.SUPABASE_ADMIN_EMAIL?.trim().toLowerCase();
+  const adminEmail = getConfiguredAdminEmail();
 
   if (!adminEmail) return { error: "لم يتم ضبط بريد المدير في إعدادات الخادم." };
   if (email !== adminEmail || !password) return { error: "البريد الإلكتروني أو كلمة المرور غير صحيحة." };

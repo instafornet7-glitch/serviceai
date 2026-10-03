@@ -1,15 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { LoginForm } from "@/components/admin-forms";
+import { getConfiguredAdminEmail } from "@/lib/admin-config";
+import { isSupabaseConfigured } from "@/lib/supabase/config";
 
+export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "دخول المدير", robots: { index: false, follow: false } };
 
 export default async function AdminLoginPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   const { error } = await searchParams;
   const configError = error === "configuration"
-    || !process.env.NEXT_PUBLIC_SUPABASE_URL
-    || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-    || !process.env.SUPABASE_ADMIN_EMAIL;
+    || !isSupabaseConfigured()
+    || !getConfiguredAdminEmail();
   return (
     <main className="admin-login-page">
       <section className="admin-login-card">

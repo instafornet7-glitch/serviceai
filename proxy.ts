@@ -1,17 +1,18 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { getConfiguredAdminEmail } from "@/lib/admin-config";
+import { getSupabasePublicConfig } from "@/lib/supabase/config";
 
 export async function proxy(request: NextRequest) {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const supabaseConfig = getSupabasePublicConfig();
   const isLoginPage = request.nextUrl.pathname === "/admin/login";
-  if (!url || !anonKey) {
+  if (!supabaseConfig) {
     if (isLoginPage) return NextResponse.next();
     return NextResponse.redirect(new URL("/admin/login?error=configuration", request.url));
   }
 
   let response = NextResponse.next({ request });
-  const supabase = createServerClient(url, anonKey, {
+  const supabase = createServerClient(supabaseConfig.url, supabaseConfig.anonKey, {
     cookies: {
       getAll: () => request.cookies.getAll(),
       setAll(cookiesToSet) {
@@ -23,7 +24,7 @@ export async function proxy(request: NextRequest) {
   });
 
   const { data: { user }, error } = await supabase.auth.getUser();
-  const adminEmail = process.env.SUPABASE_ADMIN_EMAIL?.trim().toLowerCase();
+  const adminEmail = getConfiguredAdminEmail();
   const isAdmin = Boolean(
     !error
     && user

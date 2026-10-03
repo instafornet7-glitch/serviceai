@@ -1,13 +1,13 @@
 import { DEFAULT_SITE_BRANDING, parseSitePreferences } from "@/lib/site-preferences";
+import { getSupabasePublicConfig } from "@/lib/supabase/config";
 
 export async function getSiteBranding() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!supabaseUrl || !anonKey) return DEFAULT_SITE_BRANDING;
+  const supabaseConfig = getSupabasePublicConfig();
+  if (!supabaseConfig) return DEFAULT_SITE_BRANDING;
 
-  const settingsUrl = new URL("/rest/v1/site_preferences?key=eq.branding&select=value", supabaseUrl);
+  const settingsUrl = new URL("/rest/v1/site_preferences?key=eq.branding&select=value", supabaseConfig.url);
   const response = await fetch(settingsUrl, {
-    headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` },
+    headers: { apikey: supabaseConfig.anonKey, Authorization: `Bearer ${supabaseConfig.anonKey}` },
     next: { revalidate: 300, tags: ["site-preferences"] },
   });
 

@@ -12,14 +12,14 @@ Arabic, RTL Next.js site with a public, account-free articles blog and a manager
 1. Install dependencies with `npm install`.
 2. Copy `.env.example` to `.env.local` (or configure the equivalent environment variables in your deployment) and set:
    - `NEXT_PUBLIC_SUPABASE_URL`: the Supabase project URL.
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: the project's publishable/anon key. Do not use a service-role key.
-   - `SUPABASE_ADMIN_EMAIL`: the exact email address of the single manager account.
+   - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (recommended) or `NEXT_PUBLIC_SUPABASE_ANON_KEY`: the project's publishable/anon key. Do not use a service-role/secret key.
+   - `SUPABASE_ADMIN_EMAIL` or `ADMIN_EMAIL`: the exact email address of the single manager account.
    - `NEXT_PUBLIC_SITE_URL`: the public site origin, without a trailing slash.
    
    Set the Supabase URL before running `npm run build`; Next.js uses it to allow-list the article image host for image optimization.
 3. In Supabase SQL Editor, run [`supabase/migrations/20261002190000_initial_cms.sql`](./supabase/migrations/20261002190000_initial_cms.sql). This migration must be applied to the same Supabase project configured in `.env.local`; without it the public article list and CMS tables are unavailable.
 4. Run [`supabase/migrations/20261003000000_site_preferences.sql`](./supabase/migrations/20261003000000_site_preferences.sql) to add the administrator-controlled AdSense placements and public social-link settings.
-5. In Supabase Dashboard, create one Auth user for the manager using the email configured in `SUPABASE_ADMIN_EMAIL`. Set a new, unique password directly in Supabase Auth; never put a password in source code, SQL migrations, or environment files. Do not enable public sign-up. Set the user's **app metadata** (not user-editable metadata) to `{"role":"admin"}`. Alternatively, in SQL Editor after creating the user, run the following with the manager's real email:
+5. In Supabase Dashboard, create one Auth user for the manager using the email configured in `SUPABASE_ADMIN_EMAIL` or `ADMIN_EMAIL`. Set a new, unique password directly in Supabase Auth; never put a password in source code, SQL migrations, or environment files. Do not enable public sign-up. Set the user's **app metadata** (not user-editable metadata) to `{"role":"admin"}`. Alternatively, in SQL Editor after creating the user, run the following with the manager's real email:
 
    ```sql
    update auth.users
@@ -27,7 +27,7 @@ Arabic, RTL Next.js site with a public, account-free articles blog and a manager
    where lower(email) = lower('admin@example.com');
    ```
 
-   Confirm that exactly one row was updated and that its email matches `SUPABASE_ADMIN_EMAIL`. Sign out and sign in again after changing app metadata so Supabase issues a new session token.
+   Confirm that exactly one row was updated and that its email matches the configured manager email. Sign out and sign in again after changing app metadata so Supabase issues a new session token.
 6. Run `npm run dev` and open `http://localhost:3000`.
 
 If an administrator password has been shared in chat, email, or another untrusted channel, reset it in Supabase Auth before using the account.
