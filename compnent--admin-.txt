@@ -1,0 +1,39 @@
+import Link from "next/link";
+import { FileText, LayoutDashboard, LogOut, Settings2, Sparkles } from "lucide-react";
+import { logoutAction } from "@/app/admin/(panel)/actions";
+
+const navigation = [
+  { href: "/admin", label: "نظرة عامة", icon: LayoutDashboard },
+  { href: "/admin/posts", label: "المقالات", icon: FileText },
+  { href: "/admin/categories", label: "التصنيفات", icon: Settings2 },
+];
+
+export function AdminShell({ children, email }: { children: React.ReactNode; email: string }) {
+  return (
+    <div className="admin-shell">
+      <aside className="admin-sidebar">
+        <Link className="admin-brand" href="/admin">
+          <span className="admin-brand__icon"><Sparkles size={18} aria-hidden="true" /></span>
+          <span><strong>serviceAI</strong><small>إدارة المحتوى</small></span>
+        </Link>
+        <p className="admin-sidebar__label">مساحة العمل</p>
+        <nav className="admin-navigation" aria-label="قائمة الإدارة">
+          {navigation.map(({ href, label, icon: Icon }) => (
+            <Link href={href} key={href}><Icon size={18} aria-hidden="true" /><span>{label}</span></Link>
+          ))}
+        </nav>
+        <div className="admin-sidebar__bottom">
+          <span className="admin-avatar" aria-hidden="true">{email.slice(0, 1).toUpperCase()}</span>
+          <span className="admin-sidebar__email" title={email}>{email}</span>
+          <form action={logoutAction}>
+            <button className="admin-logout" type="submit" aria-label="تسجيل الخروج" title="تسجيل الخروج"><LogOut size={17} aria-hidden="true" /></button>
+          </form>
+        </div>
+      </aside>
+      <div className="admin-main">
+        <header className="admin-topbar"><span>لوحة تحكم serviceAI</span><span className="admin-topbar__secure">مساحة المدير</span></header>
+        <main className="admin-content">{children}</main>
+      </div>
+    </div>
+  );
+}

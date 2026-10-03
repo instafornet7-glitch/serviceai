@@ -1,0 +1,61 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { ArticleCard, SiteFooter, SiteHeader } from "@/components/site";
+import { HomeHeroCopy, SiteNameText } from "@/components/site-branding-display";
+import { HomeSlider } from "@/components/home-slider";
+import { CmsSchemaNotReadyError, getPublishedArticles, type ArticleCardData } from "@/lib/data";
+import { isSupabaseConfigured } from "@/lib/supabase/config";
+
+export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
+
+export default async function HomePage() {
+  const cmsConfigured = isSupabaseConfigured();
+  let articles: ArticleCardData[] = [];
+  let cmsSchemaNotReady = false;
+  if (cmsConfigured) {
+    try {
+      articles = await getPublishedArticles(3);
+    } catch (error) {
+      if (!(error instanceof CmsSchemaNotReadyError)) throw error;
+      console.error(error.message, error.cause);
+      cmsSchemaNotReady = true;
+    }
+  }
+  return (
+    <>
+      <SiteHeader active="/" />
+      <main id="main">
+        <section className="hero"><div className="container hero-grid"><div className="hero-copy"><HomeHeroCopy /></div>
+          <HomeSlider fallback={<div className="hero-art" aria-label="رسم توضيحي لملف مهني ولوحة تقدم" role="img"><div className="art-orbit orbit-one" /><div className="art-orbit orbit-two" /><div className="floating-note note-top"><span className="note-icon note-green">✓</span><span><strong>ملفك يتألق</strong><small>خطوة أقرب للفرصة</small></span></div><div className="profile-card"><div className="profile-top"><span className="profile-label">ملفك المهني</span><span className="profile-menu">•••</span></div><div className="profile-person"><div className="profile-avatar">م</div><div><strong>ملف مهني متميز</strong><small>جاهز لفرصتك القادمة</small></div><span className="verified">✓</span></div><div className="progress-heading"><span>اكتمال الملف</span><strong>٨٥٪</strong></div><div className="progress-track"><span /></div><div className="profile-divider" /><div className="profile-section-label">مهاراتك الأساسية</div><div className="skill-list"><span>التواصل</span><span>القيادة</span><span>التفكير الإبداعي</span></div><div className="profile-bottom"><span className="tiny-spark">✦</span><span>كل خطوة تقرّبك من هدفك</span></div></div><div className="floating-note note-bottom"><span className="note-icon note-blue">✦</span><span><strong>خطوتك القادمة</strong><small>استعد للمقابلة بثقة</small></span><span className="note-arrow">↗</span></div><span className="art-spark spark-one">✦</span><span className="art-spark spark-two">✳</span></div>} />
+        </div><div className="hero-bottom container"><span>أدوات عملية</span><i /><span>خطوات أوضح</span><i /><span>فرص أفضل</span></div></section>
+
+        <section className="section section-benefits" id="why-serviceai"><div className="container"><div className="section-heading centered"><span className="eyebrow">لماذا <SiteNameText />؟</span><h2>رحلتك المهنية تستحق<br /><span className="text-gradient">دعمًا أذكى.</span></h2><p>البحث عن وظيفة لا يجب أن يكون معقدًا. نرتّب لك الخطوات ونمنحك المصادر التي تحتاجها لتتقدم بثقة.</p></div><div className="benefit-grid">
+          <article className="benefit-card"><div className="icon-box icon-blue"><span aria-hidden="true">▤</span></div><h3>ملف يعبّر عنك</h3><p>قدّم خبراتك ومهاراتك بصورة واضحة واحترافية تلفت انتباه أصحاب العمل.</p></article>
+          <article className="benefit-card"><div className="icon-box icon-green"><span aria-hidden="true">✦</span></div><h3>استعداد بثقة</h3><p>تعرّف على خطوات عملية تساعدك على التحضير للمقابلات والتحدث عن نفسك بثقة.</p></article>
+          <article className="benefit-card"><div className="icon-box icon-lilac"><span aria-hidden="true">⌕</span></div><h3>بحث أكثر تركيزًا</h3><p>نساعدك على تنظيم بحثك عن الفرص والتركيز على الوظائف الأقرب لأهدافك.</p></article>
+        </div></div></section>
+
+        <section className="section section-tools"><div className="container"><div className="section-heading split-heading"><div><span className="eyebrow">أدواتك في مكان واحد</span><h2>كل خطوة، <span className="text-gradient">بوضوح أكبر.</span></h2></div><Link className="text-link" href="/tools">عرض جميع الأدوات <span aria-hidden="true">←</span></Link></div><div className="tools-grid">
+          <Link className="tool-card tool-card-available" href="/tools/resume-builder"><div className="tool-icon tool-icon-blue"><span aria-hidden="true">▤</span></div><span className="tool-status tool-status-live">مجاني · متاح الآن</span><h3>منشئ السيرة الذاتية</h3><p>أنشئ سيرة ذاتية احترافية تبرز خبراتك ومهاراتك.</p><span className="card-link">ابدأ إنشاء سيرتك الذاتية <b>←</b></span></Link>
+          <Link className="tool-card tool-card-available" href="/tools/resume-analyzer"><div className="tool-icon tool-icon-green"><span aria-hidden="true">✓</span></div><span className="tool-status tool-status-live">مجاني · متاح الآن</span><h3>محلل السيرة الذاتية وATS</h3><p>افحص وضوح سيرتك الذاتية وقارن كلماتها بمتطلبات الوظيفة.</p><span className="card-link">حلل سيرتك الذاتية <b>←</b></span></Link>
+          <Link className="tool-card tool-card-available" href="/tools/ats-keywords"><div className="tool-icon tool-icon-teal"><span aria-hidden="true">⌕</span></div><span className="tool-status tool-status-live">مجاني · متاح الآن</span><h3>ATS Keyword Generator</h3><p>استخرج المهارات والكلمات المهمة من إعلان الوظيفة.</p><span className="card-link">استخرج كلمات ATS <b>←</b></span></Link>
+          <Link className="tool-card tool-card-available" href="/tools/interview-questions"><div className="tool-icon tool-icon-green"><span aria-hidden="true">▱</span></div><span className="tool-status tool-status-live">مجاني · متاح الآن</span><h3>الاستعداد للمقابلات</h3><p>حضّر إجاباتك وتدرّب على أسئلة مخصصة للوظيفة.</p><span className="card-link">أنشئ أسئلة المقابلة <b>←</b></span></Link>
+          <Link className="tool-card tool-card-available" href="/tools/cover-letter-generator"><div className="tool-icon tool-icon-lilac"><span aria-hidden="true">✉</span></div><span className="tool-status tool-status-live">مجاني · متاح الآن</span><h3>خطاب التقديم</h3><p>اكتب رسالة تقديم مخصصة تشرح لماذا أنت الشخص المناسب.</p><span className="card-link">أنشئ رسالة التقديم <b>←</b></span></Link>
+          <Link className="tool-card" href="/tools#career-guidance"><div className="tool-icon tool-icon-peach"><span aria-hidden="true">↗</span></div><span className="tool-status">قريبًا</span><h3>موجّهك المهني</h3><p>اكتشف خطوات تناسب أهدافك وتدعم نموك المهني.</p><span className="card-link">اكتشف الأداة <b>←</b></span></Link>
+        </div><div className="tools-cta"><span>نعمل على تجهيز أدوات تساعدك في كل مرحلة.</span><Link href="/tools">تعرّف على جميع الأدوات <span aria-hidden="true">←</span></Link></div></div></section>
+
+        <section className="section section-insight"><div className="container insight-grid"><div className="insight-art" aria-hidden="true"><div className="insight-circle" /><div className="insight-paper"><span className="paper-check">✓</span><span className="paper-line long" /><span className="paper-line medium" /><span className="paper-line short" /><div className="paper-stamp">خطوة<br />جديدة</div></div><div className="insight-badge">✦ <span>مسيرتك، بأسلوبك</span></div></div><div className="insight-copy"><span className="eyebrow">مصمّم لأجلك</span><h2>أنت أكثر من مجرد<br /><span className="text-gradient">سيرة ذاتية.</span></h2><p>وراء كل طلب وظيفة طموح وقصة تستحق أن تُروى. نساعدك على إبرازها بوضوح — من أول مراجعة لسيرتك الذاتية وحتى استعدادك للخطوة التالية.</p><ul className="check-list"><li><span>✓</span> نصائح مهنية سهلة التطبيق</li><li><span>✓</span> مصادر ترافقك في رحلتك</li><li><span>✓</span> تجربة بسيطة، تركّز على أهدافك</li></ul><Link className="button button-outline" href="/about">قصتنا ورسالتنا <span aria-hidden="true">←</span></Link></div></div></section>
+
+        <section className="section section-blog"><div className="container"><div className="section-heading split-heading"><div><span className="eyebrow">من مدونتنا</span><h2>أفكار تساعدك <span className="text-gradient">على التقدّم.</span></h2></div><Link className="text-link" href="/blog">جميع المقالات <span aria-hidden="true">←</span></Link></div>{!cmsConfigured && <p className="cms-setup-notice">أكمل إعداد متغيرات Supabase في <code>.env.local</code> لربط المقالات المنشورة.</p>}{cmsSchemaNotReady && <p className="cms-setup-notice">شغّل ترحيل قاعدة بيانات المدونة لعرض المقالات المنشورة.</p>}<div className="blog-grid">{articles.map((article) => <ArticleCard article={article} key={article.id} />)}</div>{cmsConfigured && !cmsSchemaNotReady && !articles.length && <p className="blog-note"><span>✦</span> نجهّز محتوى جديدًا لمساعدتك في رحلتك المهنية. عُد قريبًا.</p>}</div></section>
+
+        <section className="section section-faq"><div className="container faq-layout"><div className="faq-intro"><span className="eyebrow">أسئلة شائعة</span><h2>هل لديك<br /><span className="text-gradient">أسئلة؟</span></h2><p>إليك إجابات عن بعض الأسئلة التي قد تخطر ببالك. لم تجد ما تبحث عنه؟ يسعدنا أن نسمع منك.</p><Link className="text-link" href="/contact">تواصل معنا <span aria-hidden="true">←</span></Link></div><div className="faq-list"><details className="faq-item"><summary>ما هو ServiceAI؟<span className="faq-plus" aria-hidden="true" /></summary><p>ServiceAI منصة مهنية تهدف إلى مساعدة الباحثين عن عمل عبر أدوات ومحتوى عملي يدعم مختلف مراحل رحلتهم المهنية.</p></details><details className="faq-item"><summary>هل أحتاج إلى إنشاء حساب لقراءة المقالات؟<span className="faq-plus" aria-hidden="true" /></summary><p>لا. يمكن لجميع الزوار قراءة المقالات المنشورة دون إنشاء حساب أو تسجيل الدخول.</p></details><details className="faq-item"><summary>هل الأدوات متاحة للاستخدام الآن؟<span className="faq-plus" aria-hidden="true" /></summary><p>نعم. منشئ السيرة الذاتية، ومحلل ATS، ومولد كلمات ATS، ومولد رسائل التقديم، وأداة التدريب على مقابلات العمل متاحة مجانًا ودون حساب. تستخدم هذه النسخة قواعد محلية ولا تتصل بمزوّد ذكاء اصطناعي خارجي.</p></details><details className="faq-item"><summary>كيف أتواصل مع فريق ServiceAI؟<span className="faq-plus" aria-hidden="true" /></summary><p>تفضّل بزيارة <Link href="/contact">صفحة التواصل</Link> للاطلاع على حالة قنوات التواصل.</p></details></div></div></section>
+        <section className="final-cta"><div className="container final-cta-inner"><div><span className="eyebrow eyebrow-light">خطوتك تبدأ الآن</span><h2>جاهز تكتشف فرصتك القادمة؟</h2><p>ابدأ باستكشاف المصادر التي تساعدك على التقدم.</p></div><Link className="button button-white" href="/tools">استكشف الأدوات <span aria-hidden="true">←</span></Link><span className="cta-decoration" aria-hidden="true">✦</span></div></section>
+      </main>
+      <SiteFooter />
+    </>
+  );
+}
