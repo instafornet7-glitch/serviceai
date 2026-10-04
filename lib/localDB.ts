@@ -10,6 +10,7 @@ export const LOCAL_DB_KEYS = {
   requests: "requests",
   clients: "clients",
   orders: "orders",
+  pages: "pages",
 } as const;
 
 const initialCategories = [

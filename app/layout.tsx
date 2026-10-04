@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getSiteUrl } from "@/lib/site-url";
 import { SitePreferencesProvider } from "@/components/site-preferences-provider";
+import { ManagedPageContent } from "@/components/managed-page-content";
 import "../styles.css";
 import "./admin.css";
 
@@ -29,5 +30,5 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="ar" dir="rtl" data-scroll-behavior="smooth"><body><SitePreferencesProvider>{children}</SitePreferencesProvider></body></html>;
+  return <html lang="ar" dir="rtl" data-scroll-behavior="smooth"><body><SitePreferencesProvider><ManagedPageContent>{children}</ManagedPageContent></SitePreferencesProvider></body></html>;
 }

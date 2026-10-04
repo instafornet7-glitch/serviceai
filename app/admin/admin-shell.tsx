@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
-import { FileText, Images, KeyRound, LayoutDashboard, LogOut, Megaphone, Palette, Settings2, Share2, Sparkles } from "lucide-react";
+import { FileText, Files, Images, KeyRound, LayoutDashboard, LogOut, Megaphone, Palette, Settings2, Share2, Sparkles } from "lucide-react";
 import { logoutLocalAdmin } from "@/lib/local-admin-auth";
 
 const navigation = [
@@ -15,6 +15,7 @@ const navigation = [
   { href: "/admin/slider", label: "سلايدر الصفحة", icon: Images },
   { href: "/admin/social", label: "روابط التواصل", icon: Share2 },
   { href: "/admin/credentials", label: "تغيير معلومات الدخول", icon: KeyRound },
+  { href: "/admin/pages", label: "إدارة الصفحات", icon: Files },
 ];
 
 export function AdminShell({ children, email }: { children: React.ReactNode; email: string }) {
