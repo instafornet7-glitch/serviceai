@@ -24,7 +24,7 @@ export function HomeSlider({ fallback }: { fallback: React.ReactNode }) {
   const slide = slides[currentIndex];
   const image = (
     <>
-      <Image className="home-slider-image" src={slide.imageUrl} alt={slide.alt} fill priority sizes="(max-width: 940px) 100vw, 48vw" />
+      <Image className="home-slider-image" src={slide.imageUrl} alt={slide.alt} fill unoptimized priority sizes="(max-width: 940px) 100vw, 48vw" />
       {slide.caption && <span className="home-slider-caption">{slide.caption}</span>}
     </>
   );

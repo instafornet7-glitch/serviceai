@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { createDefaultSitePreferences, parseSitePreferences, type SitePreferences } from "@/lib/site-preferences";
+import { get, LOCAL_DB_KEYS, subscribe } from "@/lib/localDB";
 
 type PreferencesContextValue = {
   preferences: SitePreferences;
@@ -23,26 +24,21 @@ export function SitePreferencesProvider({ children }: { children: React.ReactNod
   const [readyPublisherId, setReadyPublisherId] = useState("");
 
   useEffect(() => {
-    const loadPreferences = async () => {
-      try {
-        const response = await fetch("/api/site-preferences", { cache: "no-store" });
-        if (!response.ok) throw new Error(`Site preferences request failed (${response.status}).`);
-        const data: unknown = await response.json();
-        setPreferences(
-          typeof data === "object" && data !== null && !Array.isArray(data)
-            ? parseSitePreferences(data as Record<string, unknown>)
-            : createDefaultSitePreferences(),
-        );
-        setPreferencesLoaded(true);
-      } catch (error) {
-        console.error("Could not load public site preferences:", error);
-      }
+    const loadPreferences = () => {
+      const data = get<Record<string, unknown>>(LOCAL_DB_KEYS.preferences, {});
+      setPreferences(parseSitePreferences(data));
+      setPreferencesLoaded(true);
     };
-    const onSettingsUpdated = () => { void loadPreferences(); };
-    void loadPreferences();
+    loadPreferences();
+    const unsubscribe = subscribe((key) => {
+      if (key === LOCAL_DB_KEYS.preferences) loadPreferences();
+    });
+    const onSettingsUpdated = () => loadPreferences();
     window.addEventListener("site-preferences-updated", onSettingsUpdated);
-
-    return () => window.removeEventListener("site-preferences-updated", onSettingsUpdated);
+    return () => {
+      unsubscribe();
+      window.removeEventListener("site-preferences-updated", onSettingsUpdated);
+    };
   }, []);
 
   useEffect(() => {
@@ -82,7 +78,7 @@ export function SitePreferencesProvider({ children }: { children: React.ReactNod
     const scriptId = "google-adsense-script";
     const existingScript = document.head.querySelector<HTMLScriptElement>(`#${scriptId}`);
 
-    if (!shouldLoadAds || !preferences.adsenseClient) return;
+    if (!shouldLoadAds || !preferences.adsenseClient || !navigator.onLine) return;
 
     const scriptSrc = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${encodeURIComponent(preferences.adsenseClient)}`;
     if (existingScript?.src === scriptSrc) return;

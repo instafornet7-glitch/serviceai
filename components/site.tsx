@@ -49,7 +49,7 @@ export function ArticleCard({ article }: { article: ArticleCardData }) {
   return (
     <Link className="article-card" href={`/blog/${article.slug}`}>
       <div className={`article-visual ${visual}`}>
-        {article.featured_image ? <Image className="article-card-image" src={article.featured_image} alt="" fill sizes="(max-width: 680px) 40vw, (max-width: 940px) 30vw, 370px" /> : <span className="article-placeholder-icon" aria-hidden="true">✦</span>}
+        {article.featured_image ? <Image className="article-card-image" src={article.featured_image} alt="" fill unoptimized sizes="(max-width: 680px) 40vw, (max-width: 940px) 30vw, 370px" /> : <span className="article-placeholder-icon" aria-hidden="true">✦</span>}
         <span className="visual-tag">{category}</span>
       </div>
       <div className="article-body"><div className="article-meta"><span>{category}</span><span>{formatDate(article.published_at)}</span></div><h3>{article.title}</h3><p>{article.excerpt}</p><span className="card-link">اقرأ المقال <b aria-hidden="true">←</b></span></div>

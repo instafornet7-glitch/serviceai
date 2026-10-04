@@ -188,6 +188,15 @@
 .branding-color-row { display: grid; grid-template-columns: 1fr 48px; align-items: center; gap: 9px; }
 .branding-color-row input[type="color"] { width: 48px; height: 37px; padding: 3px; cursor: pointer; }
 .home-slider-admin-heading { display: flex; align-items: center; justify-content: space-between; gap: 15px; }
+.slider-image-suggestions { display: grid; gap: 13px; margin-block-end: 22px; padding: 16px; border: 1px solid #e7edf4; border-radius: 9px; background: #fbfcfe; }
+.slider-image-suggestions__heading h2 { margin: 0 0 4px; color: var(--admin-ink); font-size: 13px; }
+.slider-image-suggestions__heading p { margin: 0; color: var(--admin-muted); font-size: 10px; }
+.slider-image-suggestions__search { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: end; gap: 10px; }
+.slider-image-suggestions__grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 11px; }
+.slider-image-suggestion { display: grid; gap: 7px; min-width: 0; }
+.slider-image-suggestion__preview { position: relative; min-height: 115px; overflow: hidden; border: 1px solid #e1e8f0; border-radius: 7px; background: #f0f3f7; }
+.slider-image-suggestion__preview img { object-fit: cover; }
+.slider-image-suggestion .admin-button { width: 100%; padding-inline: 7px; }
 .home-slider-admin-list { display: grid; gap: 14px; }
 .home-slider-admin-slide { display: grid; grid-template-columns: minmax(180px,.8fr) minmax(0,1.2fr); align-items: start; gap: 13px 18px; padding: 14px; border: 1px solid #e7edf4; border-radius: 9px; }
 .home-slider-admin-toolbar { display: flex; grid-column: 1 / -1; align-items: center; justify-content: space-between; color: #52657c; font-size: 11px; }
@@ -247,7 +256,9 @@
   .branding-field-grid { grid-template-columns: 1fr; }
   .branding-field-grid .branding-field-wide { grid-column: auto; }
   .home-slider-admin-heading { align-items: flex-start; flex-direction: column; }
+  .slider-image-suggestions__grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
   .home-slider-admin-slide { grid-template-columns: 1fr; }
   .home-slider-admin-toolbar { grid-column: auto; }
   .site-settings-submit { align-items: stretch; flex-direction: column; }
+  .slider-image-suggestions__search { grid-template-columns: 1fr; }
 }

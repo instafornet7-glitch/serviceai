@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArticleCard, SiteFooter, SiteHeader } from "@/components/site";
+import { SiteFooter, SiteHeader } from "@/components/site";
 import { HomeHeroCopy, SiteNameText } from "@/components/site-branding-display";
 import { HomeSlider } from "@/components/home-slider";
-import { CmsSchemaNotReadyError, getPublishedArticles, type ArticleCardData } from "@/lib/data";
-import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { LocalArticleCards } from "@/components/local-blog";
 
 export const dynamic = "force-dynamic";
 
@@ -12,19 +11,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
 };
 
-export default async function HomePage() {
-  const cmsConfigured = isSupabaseConfigured();
-  let articles: ArticleCardData[] = [];
-  let cmsSchemaNotReady = false;
-  if (cmsConfigured) {
-    try {
-      articles = await getPublishedArticles(3);
-    } catch (error) {
-      if (!(error instanceof CmsSchemaNotReadyError)) throw error;
-      console.error(error.message, error.cause);
-      cmsSchemaNotReady = true;
-    }
-  }
+export default function HomePage() {
   return (
     <>
       <SiteHeader active="/" />
@@ -50,7 +37,7 @@ export default async function HomePage() {
 
         <section className="section section-insight"><div className="container insight-grid"><div className="insight-art" aria-hidden="true"><div className="insight-circle" /><div className="insight-paper"><span className="paper-check">✓</span><span className="paper-line long" /><span className="paper-line medium" /><span className="paper-line short" /><div className="paper-stamp">خطوة<br />جديدة</div></div><div className="insight-badge">✦ <span>مسيرتك، بأسلوبك</span></div></div><div className="insight-copy"><span className="eyebrow">مصمّم لأجلك</span><h2>أنت أكثر من مجرد<br /><span className="text-gradient">سيرة ذاتية.</span></h2><p>وراء كل طلب وظيفة طموح وقصة تستحق أن تُروى. نساعدك على إبرازها بوضوح — من أول مراجعة لسيرتك الذاتية وحتى استعدادك للخطوة التالية.</p><ul className="check-list"><li><span>✓</span> نصائح مهنية سهلة التطبيق</li><li><span>✓</span> مصادر ترافقك في رحلتك</li><li><span>✓</span> تجربة بسيطة، تركّز على أهدافك</li></ul><Link className="button button-outline" href="/about">قصتنا ورسالتنا <span aria-hidden="true">←</span></Link></div></div></section>
 
-        <section className="section section-blog"><div className="container"><div className="section-heading split-heading"><div><span className="eyebrow">من مدونتنا</span><h2>أفكار تساعدك <span className="text-gradient">على التقدّم.</span></h2></div><Link className="text-link" href="/blog">جميع المقالات <span aria-hidden="true">←</span></Link></div>{!cmsConfigured && <p className="cms-setup-notice">أكمل إعداد متغيرات Supabase في <code>.env.local</code> لربط المقالات المنشورة.</p>}{cmsSchemaNotReady && <p className="cms-setup-notice">شغّل ترحيل قاعدة بيانات المدونة لعرض المقالات المنشورة.</p>}<div className="blog-grid">{articles.map((article) => <ArticleCard article={article} key={article.id} />)}</div>{cmsConfigured && !cmsSchemaNotReady && !articles.length && <p className="blog-note"><span>✦</span> نجهّز محتوى جديدًا لمساعدتك في رحلتك المهنية. عُد قريبًا.</p>}</div></section>
+        <section className="section section-blog"><div className="container"><div className="section-heading split-heading"><div><span className="eyebrow">من مدونتنا</span><h2>أفكار تساعدك <span className="text-gradient">على التقدّم.</span></h2></div><Link className="text-link" href="/blog">جميع المقالات <span aria-hidden="true">←</span></Link></div><LocalArticleCards limit={3} /><p className="blog-note"><span>✦</span> تُعرض المقالات المنشورة المخزنة على هذا المتصفح.</p></div></section>
 
         <section className="section section-faq"><div className="container faq-layout"><div className="faq-intro"><span className="eyebrow">أسئلة شائعة</span><h2>هل لديك<br /><span className="text-gradient">أسئلة؟</span></h2><p>إليك إجابات عن بعض الأسئلة التي قد تخطر ببالك. لم تجد ما تبحث عنه؟ يسعدنا أن نسمع منك.</p><Link className="text-link" href="/contact">تواصل معنا <span aria-hidden="true">←</span></Link></div><div className="faq-list"><details className="faq-item"><summary>ما هو ServiceAI؟<span className="faq-plus" aria-hidden="true" /></summary><p>ServiceAI منصة مهنية تهدف إلى مساعدة الباحثين عن عمل عبر أدوات ومحتوى عملي يدعم مختلف مراحل رحلتهم المهنية.</p></details><details className="faq-item"><summary>هل أحتاج إلى إنشاء حساب لقراءة المقالات؟<span className="faq-plus" aria-hidden="true" /></summary><p>لا. يمكن لجميع الزوار قراءة المقالات المنشورة دون إنشاء حساب أو تسجيل الدخول.</p></details><details className="faq-item"><summary>هل الأدوات متاحة للاستخدام الآن؟<span className="faq-plus" aria-hidden="true" /></summary><p>نعم. منشئ السيرة الذاتية، ومحلل ATS، ومولد كلمات ATS، ومولد رسائل التقديم، وأداة التدريب على مقابلات العمل متاحة مجانًا ودون حساب. تستخدم هذه النسخة قواعد محلية ولا تتصل بمزوّد ذكاء اصطناعي خارجي.</p></details><details className="faq-item"><summary>كيف أتواصل مع فريق ServiceAI؟<span className="faq-plus" aria-hidden="true" /></summary><p>تفضّل بزيارة <Link href="/contact">صفحة التواصل</Link> للاطلاع على حالة قنوات التواصل.</p></details></div></div></section>
         <section className="final-cta"><div className="container final-cta-inner"><div><span className="eyebrow eyebrow-light">خطوتك تبدأ الآن</span><h2>جاهز تكتشف فرصتك القادمة؟</h2><p>ابدأ باستكشاف المصادر التي تساعدك على التقدم.</p></div><Link className="button button-white" href="/tools">استكشف الأدوات <span aria-hidden="true">←</span></Link><span className="cta-decoration" aria-hidden="true">✦</span></div></section>

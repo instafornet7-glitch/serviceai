@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useActionState, useEffect, useRef, useState } from "react";
-import { ArrowDown, ArrowUp, ImagePlus, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, ImagePlus, Search, Trash2 } from "lucide-react";
 import { saveHomeSliderAction, type ActionState } from "@/lib/admin-actions";
 import type { HomeSliderSlide } from "@/lib/site-preferences";
 
@@ -16,6 +16,9 @@ function createSlide(): EditableSlide {
 
 export function HomeSliderForm({ initialSlides }: { initialSlides: HomeSliderSlide[] }) {
   const [slides, setSlides] = useState<EditableSlide[]>(initialSlides);
+  const [keywords, setKeywords] = useState("career,job-search");
+  const [suggestedImages, setSuggestedImages] = useState<string[]>([]);
+  const [searchError, setSearchError] = useState("");
   const [state, action, pending] = useActionState(saveHomeSliderAction, initialState);
   const previewUrls = useRef(new Map<string, string>());
 
@@ -48,6 +51,40 @@ export function HomeSliderForm({ initialSlides }: { initialSlides: HomeSliderSli
     setSlides((current) => current.filter((item) => item.id !== id));
   }
 
+  function searchSuggestedImages() {
+    const terms = keywords.split(",").map((term) => term.trim()).filter(Boolean);
+    if (!terms.length) {
+      setSearchError("اكتب كلمة مفتاحية واحدة على الأقل للبحث عن الصور.");
+      setSuggestedImages([]);
+      return;
+    }
+    const keyword = terms.map(encodeURIComponent).join(",");
+    setSearchError("");
+    setSuggestedImages(Array.from({ length: 8 }, (_, index) =>
+      `https://loremflickr.com/800/400/${keyword}?random=${index + 1}`,
+    ));
+  }
+
+  function addSuggestedImage(imageUrl: string, index: number) {
+    if (slides.length >= 10) {
+      setSearchError("يمكن إضافة 10 شرائح كحد أقصى.");
+      return;
+    }
+    const description = keywords.trim().replace(/\s*,\s*/g, ", ");
+    setSlides((current) => [...current, {
+      ...createSlide(),
+      imageUrl,
+      alt: `${description} - صورة مقترحة ${index + 1}`,
+    }]);
+    setSearchError("");
+  }
+
+  function fallbackToRandomImage(imageUrl: string) {
+    const random = imageUrl.match(/[?&]random=(\d+)/)?.[1] ?? "1";
+    const fallbackUrl = `https://picsum.photos/seed/serviceai-slider-${random}/800/400`;
+    setSuggestedImages((current) => current.map((url) => url === imageUrl ? fallbackUrl : url));
+  }
+
   return (
     <form action={action} className="site-settings-form">
       <input type="hidden" name="slides" value={JSON.stringify(slides.map(({ id, imageUrl, alt, caption, href }) => ({ id, imageUrl, alt, caption, href })))} />
@@ -55,8 +92,56 @@ export function HomeSliderForm({ initialSlides }: { initialSlides: HomeSliderSli
       {state.success && <p className="admin-success" role="status">{state.success}</p>}
 
       <section className="admin-panel-card site-settings-card">
+        <div className="slider-image-suggestions">
+          <div className="slider-image-suggestions__heading">
+            <div><h2>اقتراح صور مناسبة</h2><p>ابحث عن صور حسب موضوع موقعك وأضف ما يناسبك إلى السلايدر.</p></div>
+          </div>
+          <div className="slider-image-suggestions__search">
+            <label className="site-settings-field" htmlFor="slider-image-keywords">
+              <span>اكتب نوع الصور اللي بغيتي</span>
+              <input
+                id="slider-image-keywords"
+                value={keywords}
+                maxLength={120}
+                placeholder="مثال: career, job-search"
+                onChange={(event) => setKeywords(event.currentTarget.value)}
+              />
+            </label>
+            <button className="admin-button admin-button-secondary" type="button" onClick={searchSuggestedImages}>
+              <Search size={16} aria-hidden="true" /> بحث
+            </button>
+          </div>
+          {searchError && <p className="admin-alert" role="alert">{searchError}</p>}
+          {suggestedImages.length > 0 && (
+            <div className="slider-image-suggestions__grid">
+              {suggestedImages.map((imageUrl, index) => (
+                <article className="slider-image-suggestion" key={imageUrl}>
+                  <div className="slider-image-suggestion__preview">
+                    <Image
+                      src={imageUrl}
+                      alt={`اقتراح صورة ${index + 1}`}
+                      fill
+                      sizes="(max-width: 600px) 100vw, 260px"
+                      unoptimized
+                      onError={() => {
+                        if (imageUrl.startsWith("https://loremflickr.com/")) fallbackToRandomImage(imageUrl);
+                      }}
+                    />
+                  </div>
+                  <button
+                    className="admin-button admin-button-secondary"
+                    type="button"
+                    disabled={slides.length >= 10}
+                    onClick={() => addSuggestedImage(imageUrl, index)}
+                  >إضافة للسلايدر</button>
+                </article>
+              ))}
+            </div>
+          )}
+        </div>
+
         <div className="admin-card-heading home-slider-admin-heading">
-          <div><h2>شرائح الصفحة الرئيسية</h2><p>أضف حتى 10 صور. الصيغ المدعومة JPG وPNG وWebP، بحد أقصى 5 ميغابايت للصورة.</p></div>
+          <div><h2>شرائح الصفحة الرئيسية</h2><p>أضف حتى 10 صور. الصيغ المدعومة JPG وPNG وWebP، بحد أقصى 1 ميغابايت للصورة بسبب مساحة المتصفح المحلية.</p></div>
           <button className="admin-button admin-button-secondary" type="button" disabled={slides.length >= 10} onClick={() => setSlides((current) => [...current, createSlide()])}>
             <ImagePlus size={16} aria-hidden="true" /> إضافة شريحة
           </button>
@@ -78,7 +163,7 @@ export function HomeSliderForm({ initialSlides }: { initialSlides: HomeSliderSli
                   {slide.previewUrl
                     ? <Image src={slide.previewUrl} alt="" fill sizes="280px" unoptimized />
                     : slide.imageUrl
-                      ? <Image src={slide.imageUrl} alt="" fill sizes="280px" />
+                      ? <Image src={slide.imageUrl} alt="" fill unoptimized sizes="280px" />
                       : <span><ImagePlus size={25} aria-hidden="true" />اختر صورة للشريحة</span>}
                   <input
                     type="file"

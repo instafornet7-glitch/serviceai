@@ -2,26 +2,12 @@
 
 import { useActionState, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { loginAction, saveArticleAction, saveCategoryAction, type ActionState } from "@/lib/admin-actions";
+import { saveArticleAction, saveCategoryAction, type ActionState } from "@/lib/admin-actions";
 import type { ArticleData, Category } from "@/lib/data";
 import { slugify } from "@/lib/slug";
 import { RichTextEditor } from "@/components/rich-text-editor";
 
 const initialState: ActionState = {};
-
-export function LoginForm({ configError, sessionError }: { configError: boolean; sessionError: boolean }) {
-  const [state, action, pending] = useActionState(loginAction, initialState);
-  return (
-    <form className="admin-login-form" action={action}>
-      {configError && <p className="admin-alert" role="alert">إعدادات Supabase غير مكتملة. راجع ملف الإعداد قبل تسجيل الدخول.</p>}
-      {sessionError && !configError && <p className="admin-alert" role="alert">تعذر التحقق من الجلسة الحالية. يمكنك تسجيل الدخول مجددًا.</p>}
-      {state.error && <p className="admin-alert" role="alert">{state.error}</p>}
-      <label htmlFor="admin-email">البريد الإلكتروني</label><input id="admin-email" type="email" name="email" autoComplete="username" required />
-      <label htmlFor="admin-password">كلمة المرور</label><input id="admin-password" type="password" name="password" autoComplete="current-password" required />
-      <button className="admin-button admin-button-primary" type="submit" disabled={pending}>{pending ? "جارٍ التحقق..." : "تسجيل الدخول"}<span aria-hidden="true">←</span></button>
-    </form>
-  );
-}
 
 export function ArticleForm({ article, categories }: { article: ArticleData | null; categories: Category[] }) {
   const [state, action, pending] = useActionState(saveArticleAction, initialState);
@@ -39,6 +25,7 @@ export function ArticleForm({ article, categories }: { article: ArticleData | nu
       {article && <input type="hidden" name="id" value={article.id} />}
       {article?.featured_image && <input type="hidden" name="featured_image" value={article.featured_image} />}
       {state.error && <p className="admin-alert" role="alert">{state.error}</p>}
+      {state.success && <p className="admin-success" role="status">{state.success}</p>}
       <div className="admin-form-main">
         <section className="admin-panel-card">
           <label htmlFor="article-title">عنوان المقال <span>*</span></label>
@@ -68,7 +55,7 @@ export function ArticleForm({ article, categories }: { article: ArticleData | nu
         </section>
         <section className="admin-panel-card">
           <h2>الصورة الرئيسية</h2>
-          <label className="admin-upload" htmlFor="article-image"><span aria-hidden="true">↥</span><strong>اختر صورة</strong><small>JPG، PNG أو WebP · حتى 5 MB</small><input id="article-image" name="featured_image_file" type="file" accept="image/jpeg,image/png,image/webp" onChange={(event) => { const file = event.target.files?.[0]; if (file) setFeaturedPreview(URL.createObjectURL(file)); }} /></label>
+          <label className="admin-upload" htmlFor="article-image"><span aria-hidden="true">↥</span><strong>اختر صورة</strong><small>JPG، PNG أو WebP · حتى 1 MB</small><input id="article-image" name="featured_image_file" type="file" accept="image/jpeg,image/png,image/webp" onChange={(event) => { const file = event.target.files?.[0]; if (file) setFeaturedPreview(URL.createObjectURL(file)); }} /></label>
           {featuredPreview && <div className="admin-image-preview" role="img" aria-label="معاينة الصورة الرئيسية" style={{ backgroundImage: `url("${featuredPreview}")` }} />}
         </section>
       </aside>
@@ -86,6 +73,7 @@ export function CategoryForm({ category }: { category?: Category }) {
       <div><label htmlFor={`category-name-${category?.id ?? "new"}`}>اسم التصنيف</label><input id={`category-name-${category?.id ?? "new"}`} name="name" required minLength={2} maxLength={80} value={name} onChange={(event) => { setName(event.target.value); if (!category) setSlug(slugify(event.target.value)); }} placeholder="مثال: السيرة الذاتية" /></div>
       <div><label htmlFor={`category-slug-${category?.id ?? "new"}`}>الرابط</label><input id={`category-slug-${category?.id ?? "new"}`} name="slug" required pattern="[a-z0-9]+(-[a-z0-9]+)*" value={slug} onChange={(event) => setSlug(event.target.value)} placeholder="cv-guide" /><small>أدخل رابطًا إنجليزيًا قصيرًا مثل cv-guide.</small></div>
       {state.error && <p className="admin-alert" role="alert">{state.error}</p>}
+      {state.success && <p className="admin-success" role="status">{state.success}</p>}
       <button className="admin-button admin-button-primary" type="submit" disabled={pending}>{pending ? "جارٍ الحفظ..." : category ? "حفظ" : "إضافة تصنيف"}</button>
     </form>
   );

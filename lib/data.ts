@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { get, LOCAL_DB_KEYS } from "@/lib/localDB";
 
 export type Category = {
   id: string;
@@ -26,73 +26,80 @@ export type ArticleData = ArticleCardData & {
   updated_at: string;
 };
 
-const articleFields = "id,title,slug,excerpt,featured_image,published_at,keywords,content_html,meta_title,meta_description,status,created_at,updated_at,category:categories(id,name,slug)";
+type StoredArticle = Partial<Omit<ArticleData, "category">> & {
+  id: string;
+  title: string;
+  slug: string;
+  category_id?: string;
+  content?: string;
+  date?: string;
+};
 
-export class CmsSchemaNotReadyError extends Error {
-  constructor(cause: string) {
-    super("The articles table is unavailable. Apply the Supabase CMS migration.", { cause });
-    this.name = "CmsSchemaNotReadyError";
-  }
+function categories(): Category[] {
+  return get<Category[]>(LOCAL_DB_KEYS.categories, []);
 }
 
-function throwArticleQueryError(error: { code: string; message: string }, action: string): never {
-  if (error.code === "PGRST205") throw new CmsSchemaNotReadyError(error.message);
-  throw new Error(`Could not ${action}: ${error.message}`);
-}
-
-function normalizeArticle(row: Record<string, unknown>): ArticleData {
-  const category = row.category as Category | Category[] | null;
+function normalizeArticle(article: StoredArticle): ArticleData {
+  const category = categories().find((item) => item.id === article.category_id);
+  const publishedAt = article.published_at ?? article.date ?? null;
+  const content = article.content_html ?? article.content ?? "";
+  const excerpt = article.excerpt ?? content.replace(/<[^>]*>/g, "").trim().slice(0, 280);
+  const timestamp = publishedAt ?? new Date().toISOString();
   return {
-    ...row,
-    category: Array.isArray(category) ? category[0] ?? null : category,
-  } as ArticleData;
+    ...article,
+    excerpt,
+    featured_image: article.featured_image ?? null,
+    published_at: publishedAt,
+    keywords: Array.isArray(article.keywords) ? article.keywords : [],
+    category: category ?? null,
+    content_html: content,
+    meta_title: article.meta_title ?? null,
+    meta_description: article.meta_description ?? null,
+    status: article.status ?? "published",
+    created_at: article.created_at ?? timestamp,
+    updated_at: article.updated_at ?? timestamp,
+  };
 }
 
-export async function getPublishedArticles(limit?: number): Promise<ArticleCardData[]> {
-  const supabase = await createClient();
-  let query = supabase
-    .from("articles")
-    .select("id,title,slug,excerpt,featured_image,published_at,keywords,category:categories(id,name,slug)")
-    .eq("status", "published")
-    .lte("published_at", new Date().toISOString())
-    .order("published_at", { ascending: false });
-
-  if (limit) query = query.limit(limit);
-  const { data, error } = await query;
-  if (error) throwArticleQueryError(error, "load published articles");
-
-  return (data ?? []).map((row) => {
-    const category = row.category as Category | Category[] | null;
-    return { ...row, category: Array.isArray(category) ? category[0] ?? null : category } as ArticleCardData;
-  });
+function articles(): ArticleData[] {
+  return get<StoredArticle[]>(LOCAL_DB_KEYS.articles, []).map(normalizeArticle);
 }
 
-export async function getPublishedArticle(slug: string): Promise<ArticleData | null> {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("articles")
-    .select(articleFields)
-    .eq("slug", slug)
-    .eq("status", "published")
-    .lte("published_at", new Date().toISOString())
-    .maybeSingle();
-
-  if (error) throwArticleQueryError(error, "load article");
-  return data ? normalizeArticle(data as Record<string, unknown>) : null;
+export function getPublishedArticles(limit?: number): ArticleCardData[] {
+  const now = Date.now();
+  const published = articles()
+    .filter((article) => article.status === "published" && (!article.published_at || Date.parse(article.published_at) <= now))
+    .sort((a, b) => Date.parse(b.published_at ?? b.updated_at) - Date.parse(a.published_at ?? a.updated_at))
+  return (limit ? published.slice(0, limit) : published).map((article) => ({
+    id: article.id,
+    title: article.title,
+    slug: article.slug,
+    excerpt: article.excerpt,
+    featured_image: article.featured_image,
+    published_at: article.published_at,
+    keywords: article.keywords,
+    category: article.category,
+  }));
 }
 
-export async function getArticleById(id: string): Promise<ArticleData | null> {
-  const supabase = await createClient();
-  const { data, error } = await supabase.from("articles").select(articleFields).eq("id", id).maybeSingle();
-  if (error) throw new Error(`Could not load article: ${error.message}`);
-  return data ? normalizeArticle(data as Record<string, unknown>) : null;
+export function getPublishedArticle(slug: string): ArticleData | null {
+  const article = articles()
+    .find((item) => item.slug === slug && item.status === "published"
+      && (!item.published_at || Date.parse(item.published_at) <= Date.now()));
+  return article ?? null;
 }
 
-export async function getCategories(): Promise<Category[]> {
-  const supabase = await createClient();
-  const { data, error } = await supabase.from("categories").select("id,name,slug").order("name");
-  if (error) throw new Error(`Could not load categories: ${error.message}`);
-  return data ?? [];
+export function getArticleById(id: string): ArticleData | null {
+  return articles().find((item) => item.id === id) ?? null;
+}
+
+export function getCategories(): Category[] {
+  return categories().sort((a, b) => a.name.localeCompare(b.name, "ar"));
+}
+
+export function getAllArticles(): ArticleData[] {
+  return articles()
+    .sort((a, b) => Date.parse(b.updated_at) - Date.parse(a.updated_at));
 }
 
 export function articleCardCategory(article: ArticleCardData): string {

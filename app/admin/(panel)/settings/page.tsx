@@ -1,32 +1,14 @@
-import type { Metadata } from "next";
-import { AdminNotice } from "@/components/admin-forms";
+"use client";
+
 import { SiteSettingsForm } from "@/components/site-settings-form";
 import { parseSitePreferences } from "@/lib/site-preferences";
-import { createClient } from "@/lib/supabase/server";
+import { LOCAL_DB_KEYS } from "@/lib/localDB";
+import { useLocalDBValue } from "@/lib/use-local-db";
 
-export const metadata: Metadata = { title: "إعدادات الموقع" };
-
-export default async function AdminSettingsPage() {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("site_preferences")
-    .select("key,value")
-    .eq("key", "adsense");
-
-  const preferencesData = Object.fromEntries(
-    (data ?? [])
-      .filter((row) => typeof row.key === "string")
-      .map((row) => [row.key, row.value]),
-  );
-
-  return (
-    <div className="admin-page">
-      <AdminNotice />
-      <div className="admin-page-heading">
-        <div><span className="admin-kicker">تخصيص الموقع</span><h1>إعدادات الموقع</h1><p>تحكم بمعرّف الناشر ومواضع إعلانات Google AdSense.</p></div>
-      </div>
-      {error && <div className="admin-alert" role="alert">تعذر تحميل الإعدادات المحفوظة. يمكنك تعديلها أدناه، وتأكد من تهيئة جدول <code>site_preferences</code> في Supabase.</div>}
-      <SiteSettingsForm preferences={parseSitePreferences(preferencesData)} />
-    </div>
-  );
+export default function AdminSettingsPage() {
+  const stored = useLocalDBValue<Record<string, unknown>>(LOCAL_DB_KEYS.preferences, {});
+  return <div className="admin-page">
+    <div className="admin-page-heading"><div><span className="admin-kicker">تخصيص الموقع</span><h1>إعدادات الموقع</h1><p>تُحفظ مواضع الإعلانات محليًا على هذا المتصفح فقط.</p></div></div>
+    <SiteSettingsForm key={JSON.stringify(stored)} preferences={parseSitePreferences(stored)} />
+  </div>;
 }

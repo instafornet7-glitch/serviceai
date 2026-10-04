@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { getSiteUrl } from "@/lib/site-url";
 import { SitePreferencesProvider } from "@/components/site-preferences-provider";
-import { getAdsensePublisherId } from "@/lib/adsense";
-import { getSiteBranding } from "@/lib/site-branding";
 import "../styles.css";
 import "./admin.css";
 
@@ -27,25 +25,7 @@ const baseMetadata: Metadata = {
 };
 
 export async function generateMetadata(): Promise<Metadata> {
-  const [publisherId, branding] = await Promise.all([getAdsensePublisherId(), getSiteBranding()]);
-  return {
-    ...baseMetadata,
-    title: { default: `${branding.siteName} — خطوتك الذكية نحو وظيفة أحلامك`, template: `%s — ${branding.siteName}` },
-    applicationName: branding.siteName,
-    description: branding.heroDescription,
-    openGraph: {
-      ...baseMetadata.openGraph,
-      siteName: branding.siteName,
-      title: `${branding.siteName} — أدوات مهنية تساعدك على خطوتك القادمة`,
-      description: branding.heroDescription,
-    },
-    twitter: {
-      ...baseMetadata.twitter,
-      title: `${branding.siteName} — أدوات مهنية تساعدك على خطوتك القادمة`,
-      description: branding.heroDescription,
-    },
-    ...(publisherId ? { other: { "google-adsense-account": publisherId } } : {}),
-  };
+  return baseMetadata;
 }
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

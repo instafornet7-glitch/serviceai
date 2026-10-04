@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FileText, Images, LayoutDashboard, LogOut, Megaphone, Palette, Settings2, Share2, Sparkles } from "lucide-react";
-import { logoutAction } from "@/lib/admin-actions";
+import { useRouter } from "next/navigation";
+import { FileText, Images, KeyRound, LayoutDashboard, LogOut, Megaphone, Palette, Settings2, Share2, Sparkles } from "lucide-react";
+import { logoutLocalAdmin } from "@/lib/local-admin-auth";
 
 const navigation = [
   { href: "/admin", label: "نظرة عامة", icon: LayoutDashboard },
@@ -13,10 +14,22 @@ const navigation = [
   { href: "/admin/appearance", label: "هوية ومظهر الموقع", icon: Palette },
   { href: "/admin/slider", label: "سلايدر الصفحة", icon: Images },
   { href: "/admin/social", label: "روابط التواصل", icon: Share2 },
+  { href: "/admin/credentials", label: "تغيير معلومات الدخول", icon: KeyRound },
 ];
 
 export function AdminShell({ children, email }: { children: React.ReactNode; email: string }) {
   const pathname = usePathname();
+  const router = useRouter();
+
+  function logout() {
+    try {
+      logoutLocalAdmin();
+      router.replace("/admin/login");
+    } catch (error) {
+      console.error("تعذر تسجيل خروج المدير المحلي.", error);
+    }
+  }
+
   return (
     <div className="admin-shell">
       <aside className="admin-sidebar">
@@ -26,7 +39,7 @@ export function AdminShell({ children, email }: { children: React.ReactNode; ema
           {navigation.map(({ href, label, icon: Icon }) => <Link className={pathname === href || href !== "/admin" && pathname.startsWith(href) ? "is-active" : ""} href={href} key={href}><Icon size={18} aria-hidden="true" /><span>{label}</span></Link>)}
         </nav>
         <Link className="admin-new-article" href="/admin/articles/new"><span aria-hidden="true">+</span> مقال جديد</Link>
-        <div className="admin-sidebar__bottom"><span className="admin-avatar" aria-hidden="true">{email.slice(0, 1).toUpperCase()}</span><span className="admin-sidebar__email" title={email}>{email}</span><form action={logoutAction}><button className="admin-logout" type="submit" aria-label="تسجيل الخروج" title="تسجيل الخروج"><LogOut size={17} aria-hidden="true" /></button></form></div>
+        <div className="admin-sidebar__bottom"><span className="admin-avatar" aria-hidden="true">{email.slice(0, 1).toUpperCase()}</span><span className="admin-sidebar__email" title={email}>{email}</span><button className="admin-logout" type="button" aria-label="تسجيل الخروج" title="تسجيل الخروج" onClick={logout}><LogOut size={17} aria-hidden="true" /></button></div>
       </aside>
       <div className="admin-main"><header className="admin-topbar"><span>لوحة تحكم ServiceAI</span><div><Link href="/" target="_blank">عرض الموقع <span aria-hidden="true">↗</span></Link><span className="admin-topbar__secure">مساحة المدير</span></div></header><main className="admin-content">{children}</main></div>
     </div>
