@@ -1,14 +1,13 @@
 import type { Metadata } from "next";
 import { getSiteUrl } from "@/lib/site-url";
 import { SitePreferencesProvider } from "@/components/site-preferences-provider";
-import { ManagedPageContent } from "@/components/managed-page-content";
 import "../styles.css";
 import "./admin.css";
 
 const baseMetadata: Metadata = {
   metadataBase: getSiteUrl(),
   title: { default: "ServiceAI — خطوتك الذكية نحو وظيفة أحلامك", template: "%s — ServiceAI" },
-  description: "أدوات ومصادر مهنية تساعد الباحثين عن عمل على التقدم بثقة، خطوة بخطوة.",
+  description: "تقدم ServiceAI أدوات ومصادر مهنية تساعد الباحثين عن عمل على التقدم بثقة، خطوة بخطوة.",
   applicationName: "ServiceAI",
   openGraph: {
     type: "website",
@@ -30,5 +29,5 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="ar" dir="rtl" data-scroll-behavior="smooth"><body><SitePreferencesProvider><ManagedPageContent>{children}</ManagedPageContent></SitePreferencesProvider></body></html>;
+  return <html lang="ar" dir="rtl" data-scroll-behavior="smooth"><body><SitePreferencesProvider>{children}</SitePreferencesProvider></body></html>;
 }

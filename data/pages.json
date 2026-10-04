@@ -1,0 +1,26 @@
+{
+  "/contact": {
+    "title": "تواصل معنا",
+    "content": "<h1>تواصل معنا</h1><p>راسلنا على serviceai.102026@gmail.com</p>"
+  },
+  "/about": {
+    "title": "من نحن",
+    "content": "<h1>من نحن</h1>"
+  },
+  "/tools": {
+    "title": "الأدوات",
+    "content": "<h1>الأدوات</h1>"
+  },
+  "/blog": {
+    "title": "المدونة",
+    "content": "<h1>المدونة</h1>"
+  },
+  "/privacy": {
+    "title": "سياسة الخصوصية",
+    "content": ""
+  },
+  "/terms": {
+    "title": "شروط الاستخدام",
+    "content": ""
+  }
+}

@@ -8,6 +8,7 @@ function FooterHref({ href, children }: { href: string; children: React.ReactNod
   if (!href) return null;
   if (href.startsWith("/") && !href.startsWith("//")) return <Link href={href}>{children}</Link>;
   if (/^#[A-Za-z0-9_-]+$/.test(href)) return <a href={href}>{children}</a>;
+  if (/^mailto:[^\s@]+@[^\s@]+\.[^\s@]+$/i.test(href)) return <a href={href}>{children}</a>;
   if (/^https:\/\//i.test(href)) return <a href={href} target="_blank" rel="noopener noreferrer">{children}</a>;
   return null;
 }
@@ -34,6 +35,7 @@ export function SiteFooterContent() {
         <FooterHref href={brand.footerContactHref}>
           <span className="footer-email">{brand.footerContactLabel} <span aria-hidden="true">↗</span></span>
         </FooterHref>
+        <a className="footer-email" href={`mailto:${brand.contactEmail}`}>{brand.contactEmail}</a>
         <FooterSocialLinks />
       </div>
       <div className="footer-column">

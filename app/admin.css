@@ -100,6 +100,9 @@
 .admin-site-page-editor .admin-panel-card { display: flex; flex-direction: column; align-items: stretch; gap: 10px; }
 .admin-site-page-editor { display: block; }
 .admin-site-page-content { min-height: 260px; direction: ltr; font-family: Consolas, "Courier New", monospace !important; text-align: left; }
+.admin-managed-page-form { display: grid; gap: 11px; }
+.admin-managed-page-form textarea { min-height: 300px; direction: ltr; font-family: Consolas, "Courier New", monospace; text-align: left; }
+.admin-managed-page-form .admin-button { justify-self: start; min-width: 100px; }
 .admin-alert, .admin-success { margin: 0; padding: 11px 13px; border: 1px solid #f0d4d4; border-radius: 7px; background: #fff7f7; color: #a74d4d; font-size: 11px; line-height: 1.8; }
 .admin-success { border-color: #d7ebe0; background: #f3faf6; color: #3c8068; }
 .admin-alert a { color: #3e72bd; text-decoration: underline; }

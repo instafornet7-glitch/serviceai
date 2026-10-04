@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { createDefaultSitePreferences, parseSitePreferences, type SitePreferences } from "@/lib/site-preferences";
 import { get, LOCAL_DB_KEYS, subscribe } from "@/lib/localDB";
 
@@ -19,6 +20,7 @@ export function useSitePreferences() {
 }
 
 export function SitePreferencesProvider({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
   const [preferences, setPreferences] = useState(createDefaultSitePreferences);
   const [preferencesLoaded, setPreferencesLoaded] = useState(false);
   const [readyPublisherId, setReadyPublisherId] = useState("");
@@ -68,6 +70,24 @@ export function SitePreferencesProvider({ children }: { children: React.ReactNod
     root.style.setProperty("--blue-dark", preferences.branding.primaryColor);
     root.style.setProperty("--green", preferences.branding.accentColor);
   }, [preferences.branding.primaryColor, preferences.branding.accentColor]);
+
+  useEffect(() => {
+    const pageTitle = pathname === "/"
+      ? `${preferences.branding.siteName} — خطوتك الذكية نحو وظيفة أحلامك`
+      : document.title.replace(/\s+[—|]\s+ServiceAI$/, "").trim();
+    if (pageTitle) document.title = `${pageTitle} — ${preferences.branding.siteName}`;
+  }, [pathname, preferences.branding.siteName]);
+
+  useEffect(() => {
+    if (pathname !== "/") return;
+    let description = document.head.querySelector<HTMLMetaElement>('meta[name="description"]');
+    if (!description) {
+      description = document.createElement("meta");
+      description.name = "description";
+      document.head.append(description);
+    }
+    description.content = preferences.branding.heroDescription;
+  }, [pathname, preferences.branding.heroDescription]);
 
   const shouldLoadAds = Boolean(
     preferences.adsenseClient

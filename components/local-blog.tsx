@@ -18,8 +18,8 @@ export function LocalArticleCards({ limit, className = "blog-grid" }: { limit?: 
   return <div className={className}>{articles.map((article) => <ArticleCard article={article} key={article.id} />)}</div>;
 }
 
-export function LocalBlogIndex() {
-  const [articles, setArticles] = useState<ArticleCardData[]>([]);
+export function LocalBlogIndex({ initialArticles }: { initialArticles: ArticleCardData[] }) {
+  const [articles, setArticles] = useState<ArticleCardData[]>(initialArticles);
   useEffect(() => {
     const refresh = () => setArticles(getPublishedArticles());
     refresh();
@@ -55,7 +55,8 @@ export function LocalArticlePage({ slug }: { slug: string }) {
       {article.featured_image && <Image className="article-cover-image" src={article.featured_image} alt={article.title} width={1440} height={900} unoptimized />}
     </header>
     <div className="article-content">
-      <div className="article-info"><span>تاريخ النشر: {article.published_at ? new Intl.DateTimeFormat("ar", { dateStyle: "long" }).format(new Date(article.published_at)) : "—"}</span><span>التصنيف: {article.category?.name ?? "مقال مهني"}</span></div>
+      <div className="article-info"><span>تاريخ النشر: {article.published_at ? new Intl.DateTimeFormat(article.language, { dateStyle: "long" }).format(new Date(article.published_at)) : "—"}</span><span>التصنيف: {article.category?.name ?? "مقال مهني"}</span><span>بقلم: {article.author}</span></div>
+      {article.tags.length > 0 && <p className="article-tags" aria-label="الكلمات المفتاحية">{article.tags.map((tag) => <span key={tag}>{tag}</span>)}</p>}
       <div className="article-rich-content" dangerouslySetInnerHTML={{ __html: sanitizeArticleHtml(article.content_html) }} />
       {allArticles.filter((item) => item.slug !== article.slug).slice(0, 3).length > 0 && <section className="related-articles"><div className="section-heading"><span className="eyebrow">تابع القراءة</span><h2>مقالات <span className="text-gradient">ذات صلة.</span></h2></div><div className="blog-grid">{allArticles.filter((item) => item.slug !== article.slug).slice(0, 3).map((item) => <ArticleCard article={item} key={item.id} />)}</div></section>}
       <Link className="text-link article-back" href="/blog">العودة إلى المدونة <span aria-hidden="true">←</span></Link>

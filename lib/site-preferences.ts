@@ -34,6 +34,7 @@ export type SocialPreferences = {
 export type SiteBranding = {
   siteName: string;
   logoMark: string;
+  contactEmail: string;
   primaryColor: string;
   accentColor: string;
   heroEyebrow: string;
@@ -86,6 +87,7 @@ export type SitePreferences = {
 export const DEFAULT_SITE_BRANDING: SiteBranding = {
   siteName: "ServiceAI",
   logoMark: "S",
+  contactEmail: "serviceai.102026@gmail.com",
   primaryColor: "#3978e6",
   accentColor: "#29a984",
   heroEyebrow: "مستقبلك المهني يبدأ هنا",
@@ -119,13 +121,37 @@ export const DEFAULT_SITE_BRANDING: SiteBranding = {
   footerBackToTopHref: "#main",
 };
 
+export const DEFAULT_HOME_SLIDES: HomeSliderSlide[] = [
+  {
+    id: "serviceai-career-slide",
+    imageUrl: "/images/slider-career.svg",
+    alt: "شخص يخطط لخطوته المهنية القادمة",
+    caption: "خطوتك المهنية القادمة تبدأ بخطة واضحة.",
+    href: "/tools/career-guidance",
+  },
+  {
+    id: "serviceai-resume-slide",
+    imageUrl: "/images/slider-resume.svg",
+    alt: "سيرة ذاتية احترافية جاهزة للتطوير",
+    caption: "قدّم خبراتك بثقة مع أدوات السيرة الذاتية.",
+    href: "/tools/resume-builder",
+  },
+  {
+    id: "serviceai-interview-slide",
+    imageUrl: "/images/slider-interview.svg",
+    alt: "الاستعداد لمقابلة عمل بثقة",
+    caption: "استعد لمقابلتك القادمة بخطوات عملية.",
+    href: "/tools/interview-questions",
+  },
+];
+
 export function createDefaultSitePreferences(): SitePreferences {
   return {
     adsenseClient: "",
     adSlots: Object.fromEntries(AD_PLACEMENTS.map(({ id }) => [id, { enabled: false, slotId: "" }])) as Record<AdPlacementId, AdSlotPreference>,
     socialLinks: { whatsapp: "", instagram: "", facebook: "", x: "", linkedin: "", youtube: "" },
     branding: { ...DEFAULT_SITE_BRANDING },
-    homeSlider: [],
+    homeSlider: DEFAULT_HOME_SLIDES.map((slide) => ({ ...slide })),
   };
 }
 
@@ -163,7 +189,7 @@ export function parseSitePreferences(row: Record<string, unknown>): SitePreferen
     const value = branding[key];
     return typeof value === "string" ? value : DEFAULT_SITE_BRANDING[key];
   };
-  const homeSlider = Array.isArray(slider.slides)
+  const savedSlides = Array.isArray(slider.slides)
     ? slider.slides.filter((slide): slide is Record<string, unknown> => isRecord(slide)).flatMap((slide) => {
       if (
         typeof slide.id !== "string"
@@ -175,6 +201,11 @@ export function parseSitePreferences(row: Record<string, unknown>): SitePreferen
       return [{ id: slide.id, imageUrl: slide.imageUrl, alt: slide.alt, caption: slide.caption, href: slide.href }];
     })
     : [];
+  const homeSlider = [...savedSlides];
+  for (const defaultSlide of DEFAULT_HOME_SLIDES) {
+    if (homeSlider.length >= 3) break;
+    if (!homeSlider.some((slide) => slide.id === defaultSlide.id)) homeSlider.push({ ...defaultSlide });
+  }
 
   return {
     adsenseClient: typeof row.adsense_client === "string"
@@ -187,6 +218,7 @@ export function parseSitePreferences(row: Record<string, unknown>): SitePreferen
     branding: {
       siteName: brandingValue("siteName"),
       logoMark: brandingValue("logoMark"),
+      contactEmail: brandingValue("contactEmail"),
       primaryColor: brandingValue("primaryColor"),
       accentColor: brandingValue("accentColor"),
       heroEyebrow: brandingValue("heroEyebrow"),

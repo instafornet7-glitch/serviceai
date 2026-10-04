@@ -6,9 +6,9 @@ import type { SiteBranding } from "@/lib/site-preferences";
 
 const initialState: ActionState = {};
 
-const identityAndHeroFields: { key: "siteName" | "logoMark" | "heroEyebrow" | "heroTitle" | "heroHighlight" | "heroPrimaryButton" | "heroDescription"; label: string; multiline?: boolean; wide?: boolean }[] = [
-  { key: "siteName", label: "اسم الموقع" },
+const identityAndHeroFields: { key: "logoMark" | "contactEmail" | "heroEyebrow" | "heroTitle" | "heroHighlight" | "heroPrimaryButton" | "heroDescription"; label: string; multiline?: boolean; wide?: boolean }[] = [
   { key: "logoMark", label: "الحرف أو الرمز داخل الشعار" },
+  { key: "contactEmail", label: "بريد التواصل" },
   { key: "heroEyebrow", label: "عبارة المقدمة أعلى العنوان" },
   { key: "heroTitle", label: "عنوان الصفحة الرئيسية" },
   { key: "heroHighlight", label: "الجزء المميز من العنوان" },
@@ -16,8 +16,8 @@ const identityAndHeroFields: { key: "siteName" | "logoMark" | "heroEyebrow" | "h
   { key: "heroDescription", label: "وصف الصفحة الرئيسية", multiline: true, wide: true },
 ];
 
-const footerTextFields: { key: Exclude<keyof SiteBranding, "primaryColor" | "accentColor" | "siteName" | "logoMark" | "heroEyebrow" | "heroTitle" | "heroHighlight" | "heroDescription" | "heroPrimaryButton" | "footerContactHref" | "footerExploreToolsHref" | "footerExploreBlogHref" | "footerExploreAboutHref" | "footerInfoContactHref" | "footerPrivacyHref" | "footerTermsHref" | "footerCalloutLinkHref" | "footerBackToTopHref">; label: string; multiline?: boolean }[] = [
-  { key: "footerDescription", label: "وصف الموقع في التذييل", multiline: true },
+const footerTextFields: { key: Exclude<keyof SiteBranding, "primaryColor" | "accentColor" | "siteName" | "logoMark" | "contactEmail" | "heroEyebrow" | "heroTitle" | "heroHighlight" | "heroDescription" | "heroPrimaryButton" | "footerContactHref" | "footerExploreToolsHref" | "footerExploreBlogHref" | "footerExploreAboutHref" | "footerInfoContactHref" | "footerPrivacyHref" | "footerTermsHref" | "footerCalloutLinkHref" | "footerBackToTopHref">; label: string; multiline?: boolean }[] = [
+  { key: "footerDescription", label: "وصف الموقع في التذييل ومحركات البحث", multiline: true },
   { key: "footerContactLabel", label: "نص رابط التواصل" },
   { key: "footerExploreHeading", label: "عنوان عمود الاستكشاف" },
   { key: "footerExploreToolsLabel", label: "اسم رابط الأدوات" },
@@ -99,7 +99,7 @@ export function SiteBrandingForm({ branding }: { branding: SiteBranding }) {
               <span>{label}</span>
               {multiline
                 ? <textarea id={`brand-${key}`} name={key} defaultValue={branding[key]} maxLength={key === "heroDescription" ? 400 : 250} rows={3} required />
-                : <input id={`brand-${key}`} name={key} defaultValue={branding[key]} maxLength={key === "heroPrimaryButton" ? 40 : 100} required />}
+                : <input id={`brand-${key}`} name={key} type={key === "contactEmail" ? "email" : "text"} defaultValue={branding[key]} maxLength={key === "heroPrimaryButton" ? 40 : 150} required />}
             </label>
           ))}
         </div>

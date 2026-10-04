@@ -1,5 +1,6 @@
 {
   "name": "serviceai",
+  "description": "Professional career tools and resources for job seekers.",
   "version": "1.0.0",
   "private": true,
   "scripts": {

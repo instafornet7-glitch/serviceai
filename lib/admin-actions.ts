@@ -115,6 +115,9 @@ export async function saveArticleAction(_previous: ActionState, formData: FormDa
     meta_title: fields.meta_title || null,
     meta_description: fields.meta_description || null,
     status: fields.status,
+    author: "ServiceAI Team",
+    tags: fields.keywords.split(",").map((word) => word.trim()).filter(Boolean),
+    language: "ar",
     published_at: publishedAt,
     featured_image: featuredImage,
     created_at: old?.created_at ?? now,
@@ -238,6 +241,9 @@ export async function saveSiteBrandingAction(_previous: ActionState, formData: F
   if (!branding.siteName.trim() || !/^#[0-9a-f]{6}$/i.test(branding.primaryColor) || !/^#[0-9a-f]{6}$/i.test(branding.accentColor)) {
     return { error: "تحقق من اسم الموقع وألوان الهوية." };
   }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(branding.contactEmail)) {
+    return { error: "أدخل بريدًا إلكترونيًا صالحًا للتواصل." };
+  }
   const hrefKeys = Object.keys(branding).filter((key) => key.endsWith("Href")) as (keyof SiteBranding)[];
   for (const key of hrefKeys) {
     const value = branding[key];
@@ -260,7 +266,7 @@ export async function saveHomeSliderAction(_previous: ActionState, formData: For
   } catch {
     return { error: "تعذر قراءة بيانات الشرائح." };
   }
-  if (!Array.isArray(submitted) || submitted.length > 10) return { error: "يمكن إضافة 10 شرائح كحد أقصى." };
+  if (!Array.isArray(submitted) || submitted.length < 3 || submitted.length > 10) return { error: "يجب أن يحتوي السلايدر على 3 شرائح على الأقل و10 شرائح كحد أقصى." };
   const slides: HomeSliderSlide[] = [];
   for (const value of submitted) {
     if (typeof value !== "object" || value === null) return { error: "بيانات الشريحة غير صالحة." };

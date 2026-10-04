@@ -25,7 +25,7 @@ export function HomeSlider({ fallback }: { fallback: React.ReactNode }) {
   const image = (
     <>
       <Image className="home-slider-image" src={slide.imageUrl} alt={slide.alt} fill unoptimized priority sizes="(max-width: 940px) 100vw, 48vw" />
-      {slide.caption && <span className="home-slider-caption">{slide.caption}</span>}
+      {slide.caption && <span className="home-slider-caption"><span>{slide.caption}</span>{slide.href && <span className="home-slider-cta">اكتشف الأداة <b aria-hidden="true">←</b></span>}</span>}
     </>
   );
 

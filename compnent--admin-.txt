@@ -14,7 +14,7 @@ export function AdminShell({ children, email }: { children: React.ReactNode; ema
       <aside className="admin-sidebar">
         <Link className="admin-brand" href="/admin">
           <span className="admin-brand__icon"><Sparkles size={18} aria-hidden="true" /></span>
-          <span><strong>serviceAI</strong><small>إدارة المحتوى</small></span>
+          <span><strong>ServiceAI</strong><small>إدارة المحتوى</small></span>
         </Link>
         <p className="admin-sidebar__label">مساحة العمل</p>
         <nav className="admin-navigation" aria-label="قائمة الإدارة">
@@ -31,7 +31,7 @@ export function AdminShell({ children, email }: { children: React.ReactNode; ema
         </div>
       </aside>
       <div className="admin-main">
-        <header className="admin-topbar"><span>لوحة تحكم serviceAI</span><span className="admin-topbar__secure">مساحة المدير</span></header>
+        <header className="admin-topbar"><span>لوحة تحكم ServiceAI</span><span className="admin-topbar__secure">مساحة المدير</span></header>
         <main className="admin-content">{children}</main>
       </div>
     </div>

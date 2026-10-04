@@ -45,6 +45,7 @@ export function HomeSliderForm({ initialSlides }: { initialSlides: HomeSliderSli
   }
 
   function removeSlide(id: string) {
+    if (slides.length <= 3) return;
     const previewUrl = previewUrls.current.get(id);
     if (previewUrl) URL.revokeObjectURL(previewUrl);
     previewUrls.current.delete(id);
@@ -141,7 +142,7 @@ export function HomeSliderForm({ initialSlides }: { initialSlides: HomeSliderSli
         </div>
 
         <div className="admin-card-heading home-slider-admin-heading">
-          <div><h2>شرائح الصفحة الرئيسية</h2><p>أضف حتى 10 صور. الصيغ المدعومة JPG وPNG وWebP، بحد أقصى 1 ميغابايت للصورة بسبب مساحة المتصفح المحلية.</p></div>
+          <div><h2>شرائح الصفحة الرئيسية</h2><p>تبدأ الصفحة بثلاث شرائح جاهزة. يمكنك تعديلها وإضافة ما يصل إلى 10 صور إجمالًا. الصيغ المدعومة JPG وPNG وWebP، بحد أقصى 1 ميغابايت للصورة.</p></div>
           <button className="admin-button admin-button-secondary" type="button" disabled={slides.length >= 10} onClick={() => setSlides((current) => [...current, createSlide()])}>
             <ImagePlus size={16} aria-hidden="true" /> إضافة شريحة
           </button>
@@ -156,7 +157,7 @@ export function HomeSliderForm({ initialSlides }: { initialSlides: HomeSliderSli
                   <div>
                     <button className="admin-icon-button" type="button" aria-label={`نقل الشريحة ${index + 1} للأعلى`} disabled={index === 0} onClick={() => moveSlide(index, -1)}><ArrowUp size={16} /></button>
                     <button className="admin-icon-button" type="button" aria-label={`نقل الشريحة ${index + 1} للأسفل`} disabled={index === slides.length - 1} onClick={() => moveSlide(index, 1)}><ArrowDown size={16} /></button>
-                    <button className="admin-icon-button admin-icon-button-danger" type="button" aria-label={`حذف الشريحة ${index + 1}`} onClick={() => removeSlide(slide.id)}><Trash2 size={16} /></button>
+                    <button className="admin-icon-button admin-icon-button-danger" type="button" aria-label={`حذف الشريحة ${index + 1}`} title={slides.length <= 3 ? "يلزم وجود ثلاث شرائح على الأقل" : "حذف الشريحة"} disabled={slides.length <= 3} onClick={() => removeSlide(slide.id)}><Trash2 size={16} /></button>
                   </div>
                 </div>
                 <label className="home-slider-upload">

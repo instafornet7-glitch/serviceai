@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
-import { FileText, Files, Images, KeyRound, LayoutDashboard, LogOut, Megaphone, Palette, Settings2, Share2, Sparkles } from "lucide-react";
+import { FileText, Files, Images, KeyRound, LayoutDashboard, LogOut, Megaphone, Palette, Settings2, Share2, Sparkles, Wrench } from "lucide-react";
 import { logoutLocalAdmin } from "@/lib/local-admin-auth";
 
 const navigation = [
@@ -16,6 +16,7 @@ const navigation = [
   { href: "/admin/social", label: "روابط التواصل", icon: Share2 },
   { href: "/admin/credentials", label: "تغيير معلومات الدخول", icon: KeyRound },
   { href: "/admin/pages", label: "إدارة الصفحات", icon: Files },
+  { href: "/admin/tools", label: "إدارة الأدوات", icon: Wrench },
 ];
 
 export function AdminShell({ children, email }: { children: React.ReactNode; email: string }) {
@@ -34,7 +35,7 @@ export function AdminShell({ children, email }: { children: React.ReactNode; ema
   return (
     <div className="admin-shell">
       <aside className="admin-sidebar">
-        <Link className="admin-brand" href="/admin"><span className="admin-brand__icon"><Sparkles size={18} aria-hidden="true" /></span><span><strong>serviceAI</strong><small>إدارة المحتوى</small></span></Link>
+        <Link className="admin-brand" href="/admin"><span className="admin-brand__icon"><Sparkles size={18} aria-hidden="true" /></span><span><strong>ServiceAI</strong><small>إدارة المحتوى</small></span></Link>
         <p className="admin-sidebar__label">مساحة العمل</p>
         <nav className="admin-navigation" aria-label="قائمة الإدارة">
           {navigation.map(({ href, label, icon: Icon }) => <Link className={pathname === href || href !== "/admin" && pathname.startsWith(href) ? "is-active" : ""} href={href} key={href}><Icon size={18} aria-hidden="true" /><span>{label}</span></Link>)}

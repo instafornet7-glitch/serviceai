@@ -8,6 +8,7 @@ export const LOCAL_DB_KEYS = {
   preferences: "preferences",
   services: "services",
   requests: "requests",
+  jobApplications: "job-applications",
   clients: "clients",
   orders: "orders",
   pages: "pages",
